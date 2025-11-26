@@ -1,0 +1,28 @@
+Nbits=4096;
+A=1;
+T=1;
+fs=200;
+sampsPerSymbol=T*fs;
+bits=rand(Nbits,1)>0.5;
+symbols=2*bits-1;
+S=zeros(Nbits*sampsPerSymbol,1);
+for k=1:Nbits
+    idx=(k-1)*sampsPerSymbol+1:k*sampsPerSymbol;
+    len(idx)=symbols(k)*ones(sampsPerSymbol,1);
+end
+x=len;
+N=length(x);
+
+X=fftshift(fft(x,2^nextpow2(N)));
+df=fs/length(X);
+f=(-length(X)/2:length(X)/2-1)*df;
+PSD_est=(abs(X).^2)/N/fs;
+P_theory=A^2*T*(sinc(f*T).^2);
+figure
+plot(f,10*log10(PSD_est)); hold on
+plot(f,10*log10(P_theory),'r','LineWidth',1.2)
+xlim([-5 5])
+xlabel('Frequency (Hz)')
+ylabel('PSD (dB/Hz)')
+legend('Estimated periodogram','Theoretical A^2 T sinc^2(fT)')
+grid on
